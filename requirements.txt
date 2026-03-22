@@ -1,0 +1,4 @@
+customtkinter==5.3.0
+Pillow==12.1.1
+reportlab==4.4.10
+pywin32

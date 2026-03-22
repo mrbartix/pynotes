@@ -1,0 +1,10 @@
+pyNotes
+=================
+
+1. install dependendies with pip install -r requirements.txt
+2. pywin32 may need this: python -m pywin32_postinstall
+3. run either with the shell script or with the py launcher on windows
+
+note that on windows you'll need to install dejavusansmono ttf font to print
+
+Copyrignt (C) mrbartix (GPL v3.0), see ./LICENSE
