@@ -29,15 +29,24 @@ class InfoBox(ctk.CTkToplevel):
     def __init__(self, parent, txt=str, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.geometry("300x80")
+        self.title("Info")
         if sys.platform != "win32":
             self.img_path = Path(__file__).resolve().parent / "icon.png"
             self.img = ImageTk.PhotoImage(Image.open(f"{self.img_path}"))
             self.wm_iconphoto(False, self.img)
         else: 
             self.img_path = Path(__file__).resolve().parent / "icon.ico"
-            self.iconbitmap(self.img_path)
+            self.iconbitmap(str(self.img_path))
+            # fix a bug in CTk which resets the icon after 200ms
+            self.after(201, lambda: self.iconbitmap(str(self.img_path)))
         self.label = ctk.CTkLabel(self, text=txt)
         self.label.pack(padx=20, pady=20)
+        #
+        self.transient(parent)
+        self.lift()
+        self.attributes("-topmost", True)
+        self.after(10, lambda: self.attributes("-topmost", False))
+        self.focus_force()
 
 class YesNoPopup(ctk.CTkToplevel):
     def __init__(self, parent, title=str, labelTxt=str, yesAction=None, noAction=None):
@@ -50,6 +59,8 @@ class YesNoPopup(ctk.CTkToplevel):
         else: 
             self.img_path = Path(__file__).resolve().parent / "icon.ico"
             self.iconbitmap(self.img_path)
+            # fix a bug in CTk which resets the icon after 200ms
+            self.after(201, lambda: self.iconbitmap(str(self.img_path)))
         self.title(title)
         self.resizable(False,False)
         self.transient(parent)
@@ -71,7 +82,7 @@ class PyNotes:
         self.root.protocol('WM_DELETE_WINDOW', self.exitapp)
         self.root.geometry("750x650")
         self.root.title("pyNotes")
-        self.root.bind("<Button-1>", lambda event: self.hidemenus) # for closing menus *stupid way*, this 'lamda event' is here because the interpreter was yelling at me
+        self.root.bind("<Button-1>", self.hidemenus) # for closing menus *stupid way*
         if sys.platform != "win32":
             self.img_path = Path(__file__).resolve().parent / "icon.png"
             self.img = ImageTk.PhotoImage(Image.open(f"{self.img_path}"))
@@ -132,10 +143,10 @@ class PyNotes:
         y = buttonvar.winfo_rooty() + buttonvar.winfo_height()
         menuvar.post(x, y)
         if sys.platform != "win32": menuvar.grab_set()
-    def hidemenus(self):
+    def hidemenus(self, *args, **kwargs):
         try:
             self.fmenu.unpost()
-            self.fmenu.grab_release()
+            if sys.platform != "win32": self.fmenu.grab_release()
         except: pass
     def openInfo(self):
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
@@ -212,11 +223,10 @@ class PyNotes:
                 win32api.ShellExecute(0, "printto", str(filename), f'"{printer_name}"', ".", 0)
                 printwindow = InfoBox(self.root, txt="Printing...")
                 printwindow.after(3000, printwindow.destroy())
-                subprocess.run(["rd", "/s", "/q", str(filename)], check=True)
+                subprocess.run(["del", str(filename)], check=True)
             except Exception as e: 
                 print(f"[ERR]: Printing failed, either something is wrong, you don't have a printer or something else; {e}")
         else: print("You aren't on linux, macos or windows - sorry!")
-        
     def ppass(self):
         pass # this exists because im lazy and its the fastest way to get around a problem (i can't pass 'pass' to lambda)
 
