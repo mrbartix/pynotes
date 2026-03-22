@@ -7,6 +7,6 @@ pyNotes
 
 note that on windows you'll need to install dejavusansmono ttf font to print
 also note that the windows version is worse (to be expected)
-also the shell script wont work unless you dont have bash, youll have to write your own 
+also the shell script wont work unless you have bash, youll have to write your own 
 
 Copyrignt (C) mrbartix (GPL v3.0), see ./LICENSE
